@@ -1,6 +1,7 @@
 package com.yooking.utils
 
 import android.app.Activity
+import android.content.Context
 import android.os.Environment
 import com.yooking.utils.ext.no
 import com.yooking.utils.ext.otherwise
@@ -18,7 +19,7 @@ object F {
     /**
      * 获取路径/data/user/0
      */
-    fun getExternalStorageDirectory(context: Activity): String {
+    fun getExternalStorageDirectory(context: Context): String {
         return context.filesDir.absoluteFile.absolutePath
     }
 
@@ -41,12 +42,12 @@ object F {
      * 获取assets中的文件名
      * @param path assets中的文件夹名称，根目录填""
      */
-    fun getAssetsNames(context: Activity, path: String): Array<String>? {
+    fun getAssetsNames(context: Context, path: String): Array<String>? {
         return context.assets.list(path)
     }
 
     @Deprecated("数据量过大会导致卡顿！！！慎用")
-    fun assets2Files(context: Activity, assetsPath: String, assetsNames: Array<String>) {
+    fun assets2Files(context: Context, assetsPath: String, assetsNames: Array<String>) {
         for (assetsName in assetsNames) {
             Runnable {
                 //耗时操作在线程中运行
@@ -55,12 +56,12 @@ object F {
         }
     }
 
-    fun assets2File(context: Activity, assetsPath: String, assetsName: String) {
+    fun assets2File(context: Context, assetsPath: String, assetsName: String) {
         assets2File(context, assetsPath, assetsName, getExternalStorageDirectory(context))
     }
 
     fun assets2File(
-        context: Activity,
+        context: Context,
         assetsPath: String,
         assetsName: String,
         directoryPath: String

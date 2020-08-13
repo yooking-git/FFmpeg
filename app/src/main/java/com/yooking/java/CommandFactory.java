@@ -1,6 +1,7 @@
 package com.yooking.java;
 
 import android.app.Activity;
+import android.content.Context;
 import android.util.Log;
 
 import com.yooking.utils.F;
@@ -35,7 +36,7 @@ public class CommandFactory {
     /**
      * 初始化build
      */
-    public Builder build(Activity context) {
+    public Builder build(Context context) {
         return new Builder(context);
     }
 
@@ -47,7 +48,7 @@ public class CommandFactory {
         private List<String> transformFileList;
         private final String basePath;
 
-        private Builder(Activity activity) {
+        private Builder(Context activity) {
             basePath = F.INSTANCE.getExternalStorageDirectory(activity);
             fileList = new ArrayList<>();
             transformList = new ArrayList<>();
