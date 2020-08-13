@@ -31,8 +31,10 @@ class ViewHolder(context: Activity) {
         }
     }
 
-    fun <T : View> setOnClickListener(@IdRes id: Int, onClickListener: View.OnClickListener) {
-        findView<T>(id).setOnClickListener(onClickListener)
+    fun <T : View> setOnClickListener(@IdRes vararg ids: Int, onClickListener: View.OnClickListener) {
+        ids.forEach {
+            findView<T>(it).setOnClickListener(onClickListener)
+        }
     }
 
     fun getText(@IdRes id: Int): String {

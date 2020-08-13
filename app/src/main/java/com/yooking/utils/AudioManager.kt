@@ -5,15 +5,12 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import androidx.fragment.app.FragmentActivity
 import com.permissionx.guolindev.PermissionX
 import com.yooking.ffmpegdemo.AudioService
+import com.yooking.utils.ext.no
 import com.yooking.utils.ext.yes
-import com.yooking.ffmpegdemo.MainActivity
-import androidx.core.content.ContextCompat.startForegroundService
-import android.os.Build
-
-
 
 
 /**
@@ -27,6 +24,9 @@ object AudioManager {
 
     const val KEY_MESSAGE = "message"
     private const val KEY_ACTION = "audioReceiver"
+
+    private const val KEY_CALLBACK = "audioCallback"
+    private const val KEY_MONEY = "money"
 
     fun sendBroadcast(context: Context, message: String) {
         val intent = Intent()
@@ -90,5 +90,29 @@ object AudioManager {
         val filter = IntentFilter()
         filter.addAction(KEY_ACTION)
         context.registerReceiver(receiver, filter)
+    }
+
+    fun sendCallbackMessage(context: Context, message: String) {
+        val intent = Intent()
+        intent.action = KEY_CALLBACK
+        intent.putExtra(KEY_MONEY, message)
+        context.sendBroadcast(intent)
+    }
+
+    fun addAudioServiceCallback(context: Context, callback: AudioServiceCallback) {
+        //注册广播接收器
+        val filter = IntentFilter()
+        filter.addAction(KEY_CALLBACK)
+        context.registerReceiver(object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                (intent == null).no {
+                    callback.isRunning(intent!!.getStringExtra(KEY_MONEY))
+                }
+            }
+        }, filter)
+    }
+
+    interface AudioServiceCallback {
+        fun isRunning(message: String?)
     }
 }

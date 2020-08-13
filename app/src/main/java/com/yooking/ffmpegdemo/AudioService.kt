@@ -112,6 +112,7 @@ class AudioService : Service() {
     }
 
     private fun run(message: String) {
+        AudioManager.sendCallbackMessage(this@AudioService,message)
         (audioList.size > 0).yes {
             audioList.removeAt(0)
         }

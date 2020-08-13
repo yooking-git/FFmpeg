@@ -10,6 +10,7 @@ import com.yooking.utils.L
 import com.yooking.utils.ext.no
 import com.yooking.utils.ext.otherwise
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
@@ -21,21 +22,53 @@ class MainActivity : AppCompatActivity() {
 
         initPermission()
 
+        AudioManager.addAudioServiceCallback(this@MainActivity,
+            object : AudioManager.AudioServiceCallback {
+                override fun isRunning(message: String?) {
+                    runOnUiThread {
+                        (message == null).no {
+                            holder.setText(
+                                R.id.tv_main_money,
+                                "准备播报的金额数为:\n${message!!.replace("s", "")}"
+                            )
+                        }
+
+                    }
+                }
+            })
+
         holder = ViewHolder(this@MainActivity)
 
         holder.setOnClickListener<Button>(
-            R.id.btn_main_start,
+            R.id.btn_main_start, R.id.btn_main_auto,
             onClickListener = View.OnClickListener {
-                val money = holder.getText(R.id.et_main_money)
-                money.isEmpty().no {
-                    val formatStr = Format.formatChineseMoney(money)
-                    L.i("用户输入的金额数为:${formatStr}")
-                    holder.setText(R.id.tv_main_money, "准备播报的金额数为:\n$formatStr")
+                when (it.id) {
+                    R.id.btn_main_start -> {
+                        val money = holder.getText(R.id.et_main_money)
+                        money.isEmpty().no {
+                            val incomeMoney = Format.formatIncomeMoney(money)
+                            L.i("用户输入的金额数为:${incomeMoney.replace("s", "")}")
 
-                    AudioManager.sendBroadcast(this, formatStr)
-//                    start(formatStr)
-                }.otherwise {
-                    holder.setText(R.id.tv_main_hint, "请输入金额！！")
+                            AudioManager.sendBroadcast(this, incomeMoney)
+                        }.otherwise {
+                            AudioManager.sendBroadcast(this, Format.formatUserCancel())
+                        }
+                    }
+                    R.id.btn_main_auto -> {
+                        val money = holder.getText(R.id.et_main_money)
+                        val duration = holder.getText(R.id.et_main_duration)
+                        val count = holder.getText(R.id.et_main_count)
+
+                        (money.isEmpty() || duration.isEmpty() || count.isEmpty())
+                            .no {
+                                run(money.toInt(), count.toInt(), duration.toInt() * 1000)
+                            }.otherwise {
+                                AudioManager.sendBroadcast(
+                                    this@MainActivity,
+                                    Format.formatIncomeMoney(money)
+                                )
+                            }
+                    }
                 }
             }
         )
@@ -45,9 +78,21 @@ class MainActivity : AppCompatActivity() {
         AudioManager.checkPermissionAndStartService(this)
     }
 
-    fun start(str: String) = GlobalScope.launch {
+    private fun run(money: Int, count: Int, duration: Int) = GlobalScope.launch {
+        repeat(count) {
+            L.i("第${it}次循环")
+            val randomMoney = random(money).toString()
 
+            val incomeMoney = Format.formatIncomeMoney(randomMoney)
+            AudioManager.sendBroadcast(this@MainActivity, incomeMoney)
+
+            delay(random(duration).toLong())
+        }
     }
 
-
+    private fun random(num: Int): Int {
+        val min = (num * 0.8).toInt()
+        val max = (num * 1.2).toInt()
+        return (min..max).random()
+    }
 }

@@ -19,7 +19,15 @@ object Format {
         return sdfTo.format(date!!)
     }
 
-    fun formatChineseMoney(money: String): String {
+    fun formatIncomeMoney(money: String): String {
+        return "s" + formatChineseMoney(money)
+    }
+
+    fun formatUserCancel(): String {
+        return "f"
+    }
+
+    private fun formatChineseMoney(money: String): String {
         val unit1 = arrayListOf("万", "亿")
         val unit2 = arrayListOf("", "拾", "佰", "仟")
         val value = arrayListOf("零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖")
