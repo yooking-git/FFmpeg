@@ -171,6 +171,7 @@ class MainActivity : AppCompatActivity() {
                     L.i("用户输入的金额数为:${formatStr}")
                     holder.setText(R.id.tv_main_money, "准备播报的金额数为:\n$formatStr")
 
+
                     fileHandler.sendEmptyMessage(TAG_BEGIN)
                 }.otherwise {
                     holder.setText(R.id.tv_main_hint, "请输入金额！！")
