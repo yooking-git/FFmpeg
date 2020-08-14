@@ -78,9 +78,9 @@ class AudioService : Service() {
 
     private fun getNotification(): Notification {
         val builder = Notification.Builder(this)
-            .setSmallIcon(R.mipmap.icon)
-            .setContentTitle(getString(R.string.app_name))
-            .setContentText(getString(R.string.audio_message))
+            .setSmallIcon(R.mipmap.icon_head)
+            .setContentTitle(getString(R.string.notification_title))
+            .setContentText(getString(R.string.notification_message))
         //设置Notification的ChannelID,否则不能正常显示
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             builder.setChannelId(CHANNEL_ID)
@@ -98,7 +98,7 @@ class AudioService : Service() {
     }
 
     override fun onDestroy() {
-        L.i("服务被销毁了")
+        L.i(getString(R.string.service_destroy))
         super.onDestroy()
         AudioManager.destroySendMessageCallback(this@AudioService)
     }
@@ -175,7 +175,7 @@ class AudioService : Service() {
 
         for (fileName in SoundFileUtils.getFileNamesUnDuplication(str)) {
             val file = File(basePath + File.separator + path + File.separator + fileName)
-            L.i("检测文件${fileName}是否存在？${file.exists()}")
+            L.i("fileName:${fileName}isExist？${file.exists()}")
             file.exists().no {
                 //检测到目标文件不存在时则创建数据
                 F.assets2File(this@AudioService, path, fileName)

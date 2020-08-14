@@ -1,5 +1,6 @@
 <resources>
-    <string name="app_name">假装有钱</string>
-
-    <string name="audio_message">语音播报服务正在运行…</string>
+    <string name="app_name">招财纳福</string>
+    <string name="service_destroy">服务被销毁了</string>
+    <string name="notification_title">收款语音播报</string>
+    <string name="notification_message">语音播报服务正在运行…</string>
 </resources>

@@ -9,7 +9,7 @@
 
     <application
         android:allowBackup="false"
-        android:icon="@mipmap/icon_bg"
+        android:icon="@mipmap/icon"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
