@@ -12,6 +12,7 @@ object SoundFileUtils {
 
     const val defSoundPath = "def"
     const val aliSoundPath = "alipay"
+    const val wxSoundPath = "wx"
 
     var soundPath = defSoundPath
 

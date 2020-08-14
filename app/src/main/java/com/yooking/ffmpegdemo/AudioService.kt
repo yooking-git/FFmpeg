@@ -78,7 +78,7 @@ class AudioService : Service() {
 
     private fun getNotification(): Notification {
         val builder = Notification.Builder(this)
-            .setSmallIcon(R.mipmap.ic_launcher)
+            .setSmallIcon(R.mipmap.icon)
             .setContentTitle(getString(R.string.app_name))
             .setContentText(getString(R.string.audio_message))
         //设置Notification的ChannelID,否则不能正常显示

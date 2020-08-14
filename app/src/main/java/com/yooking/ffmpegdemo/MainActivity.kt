@@ -3,10 +3,12 @@ package com.yooking.ffmpegdemo
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.yooking.utils.AudioManager
 import com.yooking.utils.Format
 import com.yooking.utils.L
+import com.yooking.utils.SoundFileUtils
 import com.yooking.utils.ext.no
 import com.yooking.utils.ext.otherwise
 import kotlinx.coroutines.GlobalScope
@@ -51,7 +53,17 @@ class MainActivity : AppCompatActivity() {
 
                             AudioManager.sendBroadcast(this, incomeMoney)
                         }.otherwise {
-                            AudioManager.sendBroadcast(this, Format.formatUserCancel())
+                            when (SoundFileUtils.soundPath) {
+                                SoundFileUtils.wxSoundPath -> {
+                                    Toast.makeText(this, "请填写必要参数~", Toast.LENGTH_LONG).show()
+                                }
+                                SoundFileUtils.aliSoundPath -> {
+                                    Toast.makeText(this, "请填写必要参数~", Toast.LENGTH_LONG).show()
+                                }
+                                SoundFileUtils.defSoundPath -> {
+                                    AudioManager.sendBroadcast(this, Format.formatUserCancel())
+                                }
+                            }
                         }
                     }
                     R.id.btn_main_auto -> {
@@ -63,10 +75,7 @@ class MainActivity : AppCompatActivity() {
                             .no {
                                 run(money.toInt(), count.toInt(), duration.toInt() * 1000)
                             }.otherwise {
-                                AudioManager.sendBroadcast(
-                                    this@MainActivity,
-                                    Format.formatIncomeMoney(money)
-                                )
+                                Toast.makeText(this, "请填写必要参数~", Toast.LENGTH_LONG).show()
                             }
                     }
                 }

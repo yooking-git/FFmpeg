@@ -88,13 +88,17 @@ object AudioManager {
                     AlertDialog.Builder(context)
                         .setTitle("请选择播放的语音")
                         .setCancelable(false)
-                        .setNeutralButton("支付宝") { _, _ ->
-                            SoundFileUtils.soundPath = SoundFileUtils.aliSoundPath
-                            startAudioService(context)
-                        }.setNegativeButton("默认") { _, _ ->
+                        .setNeutralButton("默认") { _, _ ->
                             SoundFileUtils.soundPath = SoundFileUtils.defSoundPath
                             startAudioService(context)
-                        }.show()
+                        }.setNegativeButton("支付宝") { _, _ ->
+                            SoundFileUtils.soundPath = SoundFileUtils.aliSoundPath
+                            startAudioService(context)
+                        }.setPositiveButton("微信") { _, _ ->
+                            SoundFileUtils.soundPath = SoundFileUtils.wxSoundPath
+                            startAudioService(context)
+                        }
+                        .show()
 
                 }
             }
