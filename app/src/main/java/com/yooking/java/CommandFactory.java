@@ -1,10 +1,10 @@
 package com.yooking.java;
 
-import android.app.Activity;
 import android.content.Context;
-import android.util.Log;
 
 import com.yooking.utils.F;
+import com.yooking.utils.L;
+import com.yooking.utils.SoundFileUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -64,10 +64,10 @@ public class CommandFactory {
          */
         public Builder add(String filePath) {
 
-            String defaultPath = basePath + File.separator + "sound/copy";
+            String defaultPath = basePath + File.separator + SoundFileUtils.INSTANCE.getSoundPath() + "/copy";
             String path = defaultPath + fileList.size() + ".mp3";
 
-            Log.i(">>>>>>>>>>>", "fileList.size:" + fileList.size());
+            L.INSTANCE.i("原始路径" + filePath + "生成copy文件：" + path);
 
             String[] transformCmd = FFmpegCmd.transformAudio(filePath, "libmp3lame", path);
             transformList.add(transformCmd);

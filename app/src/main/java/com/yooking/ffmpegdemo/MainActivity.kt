@@ -95,4 +95,10 @@ class MainActivity : AppCompatActivity() {
         val max = (num * 1.2).toInt()
         return (min..max).random()
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        AudioManager.stopAudioService(this@MainActivity)
+        AudioManager.destroyCallback(this@MainActivity)
+    }
 }

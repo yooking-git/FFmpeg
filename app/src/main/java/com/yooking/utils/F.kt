@@ -101,7 +101,7 @@ object F {
         file.exists().yes {
             return file.delete()
         }.otherwise {
-            L.i("删除失败，文件不存在")
+            L.i("${filePath}删除失败，文件不存在")
             return false
         }
     }

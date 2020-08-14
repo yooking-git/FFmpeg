@@ -1,6 +1,7 @@
 package com.yooking.utils
 
 import android.Manifest
+import android.app.AlertDialog
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -20,7 +21,7 @@ import com.yooking.utils.ext.yes
  */
 object AudioManager {
 
-    const val PATH_CONCAT_AUDIO = "/concatAudio.mp3"
+    var PATH_CONCAT_AUDIO = "/${SoundFileUtils.soundPath}/concatAudio.mp3"
 
     const val KEY_MESSAGE = "message"
     private const val KEY_ACTION = "audioReceiver"
@@ -42,6 +43,10 @@ object AudioManager {
         } else {
             context.startService(Intent(context, AudioService().javaClass))
         }
+    }
+
+    fun stopAudioService(context: Context) {
+        context.stopService(Intent(context, AudioService().javaClass))
     }
 
     fun checkPermissionAndStartService(context: FragmentActivity) {
@@ -80,16 +85,41 @@ object AudioManager {
             .request { allGranted, _, _ ->
                 allGranted.yes {
                     //启动服务
-                    startAudioService(context)
+                    AlertDialog.Builder(context)
+                        .setTitle("请选择播放的语音")
+                        .setCancelable(false)
+                        .setNeutralButton("支付宝") { _, _ ->
+                            SoundFileUtils.soundPath = SoundFileUtils.aliSoundPath
+                            startAudioService(context)
+                        }.setNegativeButton("默认") { _, _ ->
+                            SoundFileUtils.soundPath = SoundFileUtils.defSoundPath
+                            startAudioService(context)
+                        }.show()
+
                 }
             }
     }
 
-    fun registerBroadcast(context: Context, receiver: BroadcastReceiver) {
+    //接收播报信号相关
+    private var audioMessageReceiver: BroadcastReceiver? = null
+
+    fun registerBroadcast(context: Context, callback: SendMessageCallback) {
         //注册广播接收器
         val filter = IntentFilter()
         filter.addAction(KEY_ACTION)
-        context.registerReceiver(receiver, filter)
+        audioMessageReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                (intent == null).no {
+                    //
+                    L.i(intent!!.getStringExtra(KEY_MESSAGE) ?: error("接收到异常数据"))
+                    //判断是否正在执行
+                    val message: String =
+                        intent.getStringExtra(KEY_MESSAGE) ?: error("")
+                    callback.getMessage(message)
+                }
+            }
+        }
+        context.registerReceiver(audioMessageReceiver, filter)
     }
 
     fun sendCallbackMessage(context: Context, message: String) {
@@ -99,17 +129,40 @@ object AudioManager {
         context.sendBroadcast(intent)
     }
 
+    fun destroySendMessageCallback(context: Context) {
+        (audioMessageReceiver != null).yes {
+            context.unregisterReceiver(audioMessageReceiver)
+            audioMessageReceiver = null
+        }
+    }
+
+    interface SendMessageCallback {
+        fun getMessage(message: String)
+    }
+
+
+    //服务回调相关
+    private var callbackReceiver: BroadcastReceiver? = null
+
     fun addAudioServiceCallback(context: Context, callback: AudioServiceCallback) {
         //注册广播接收器
         val filter = IntentFilter()
         filter.addAction(KEY_CALLBACK)
-        context.registerReceiver(object : BroadcastReceiver() {
+        callbackReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 (intent == null).no {
                     callback.isRunning(intent!!.getStringExtra(KEY_MONEY))
                 }
             }
-        }, filter)
+        }
+        context.registerReceiver(callbackReceiver, filter)
+    }
+
+    fun destroyCallback(context: Context) {
+        (callbackReceiver != null).yes {
+            context.unregisterReceiver(callbackReceiver)
+            callbackReceiver = null
+        }
     }
 
     interface AudioServiceCallback {

@@ -10,6 +10,11 @@ import com.yooking.utils.ext.yes
  */
 object SoundFileUtils {
 
+    const val defSoundPath = "def"
+    const val aliSoundPath = "alipay"
+
+    var soundPath = defSoundPath
+
     //       val unit1 = arrayListOf("万", "亿")
     //        val unit2 = arrayListOf("", "拾", "佰", "仟")
     //        val value = arrayListOf("零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖")
@@ -40,8 +45,9 @@ object SoundFileUtils {
         val list: MutableList<String> = ArrayList()
         formatStr.toCharArray().forEach { char: Char ->
             soundMap.containsKey(char.toString()).yes {
-                val soundFile = soundMap[char.toString()] ?: error("无对应数据")
-                list.contains(soundFile).no {//去除重复
+                val soundFile = soundPath + "_" + (soundMap[char.toString()] ?: error("无对应数据"))
+                list.contains(soundFile).no {
+                    //去除重复
                     list.add(soundFile)
                 }
             }
@@ -53,7 +59,7 @@ object SoundFileUtils {
         val list: MutableList<String> = ArrayList()
         formatStr.toCharArray().forEach { char: Char ->
             soundMap.containsKey(char.toString()).yes {
-                val soundFile = soundMap[char.toString()] ?: error("无对应数据")
+                val soundFile = soundPath + "_" + soundMap[char.toString()] ?: error("无对应数据")
                 list.add(soundFile)
             }
         }

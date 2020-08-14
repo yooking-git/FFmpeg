@@ -4,7 +4,6 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.media.MediaPlayer
@@ -39,23 +38,6 @@ class AudioService : Service() {
     private var isRunning = false
     private lateinit var audioList: MutableList<String>
 
-    private val broadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            (intent == null).no {
-                L.i(intent!!.getStringExtra(AudioManager.KEY_MESSAGE) ?: error("接收到异常数据"))
-                //判断是否正在执行
-                val message: String =
-                    intent.getStringExtra(AudioManager.KEY_MESSAGE) ?: error("")
-                isRunning.yes {
-                    //如果正在运行，则将数据加入等待区
-                    audioList.add(message)
-                }.otherwise {
-                    run(message)
-                }
-            }
-        }
-    }
-
     override fun onCreate() {
         super.onCreate()
 
@@ -75,9 +57,19 @@ class AudioService : Service() {
 
         audioList = ArrayList()
 
-        AudioManager.registerBroadcast(this@AudioService, broadcastReceiver)
+        AudioManager.registerBroadcast(this@AudioService,
+            object : AudioManager.SendMessageCallback {
+                override fun getMessage(message: String) {
+                    isRunning.yes {
+                        //如果正在运行，则将数据加入等待区
+                        audioList.add(message)
+                    }.otherwise {
+                        run(message)
+                    }
+                }
+            })
         //将数据导出到用户的App中
-        val path = "sound"
+        val path = SoundFileUtils.soundPath
         val assetsNames: Array<String>? = F.getAssetsNames(this@AudioService, path)
         (assetsNames != null).yes {
             F.assets2Files(this@AudioService, path, assetsNames!!)
@@ -108,11 +100,11 @@ class AudioService : Service() {
     override fun onDestroy() {
         L.i("服务被销毁了")
         super.onDestroy()
-        unregisterReceiver(broadcastReceiver)
+        AudioManager.destroySendMessageCallback(this@AudioService)
     }
 
     private fun run(message: String) {
-        AudioManager.sendCallbackMessage(this@AudioService,message)
+        AudioManager.sendCallbackMessage(this@AudioService, message)
         (audioList.size > 0).yes {
             audioList.removeAt(0)
         }
@@ -132,7 +124,7 @@ class AudioService : Service() {
 
     private fun parsingData(str: String, callback: FFmpegCallback): BooleanExt<Unit> {
         val builder = CommandFactory.get().build(this@AudioService)
-        val path = "sound"
+        val path = SoundFileUtils.soundPath
         val basePath = F.getExternalStorageDirectory(this@AudioService)
         var isAllExist = true
 
@@ -175,7 +167,7 @@ class AudioService : Service() {
     private fun checkFileIsExist(str: String) {
 //        holder.setText(R.id.tv_main_hint, "开始解析数据")
         //检测音频文件是否存在
-        val path = "sound"
+        val path = SoundFileUtils.soundPath
         val basePath = F.getExternalStorageDirectory(this@AudioService)
 
         //清除之前播放的文件
