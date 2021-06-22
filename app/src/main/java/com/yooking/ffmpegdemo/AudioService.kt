@@ -42,17 +42,18 @@ class AudioService : Service() {
         super.onCreate()
 
         //显示前台通知
-        val notificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        //创建NotificationChannel
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                CHANNEL_NAME,
-                NotificationManager.IMPORTANCE_HIGH
-            )
-            notificationManager.createNotificationChannel(channel)
-        }
+//        val notificationManager =
+//            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+//        //创建NotificationChannel
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            val channel = NotificationChannel(
+//                CHANNEL_ID,
+//                CHANNEL_NAME,
+//                NotificationManager.IMPORTANCE_HIGH
+//            )
+//            notificationManager.createNotificationChannel(channel)
+//        }
+//        notificationManager.notify(111,getNotification())
         startForeground(110, getNotification())
 
         audioList = ArrayList()
